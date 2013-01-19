@@ -22,7 +22,7 @@ public class DonateEventListener implements Listener {
 		String user = event.getUsername();
 		Double amount = event.getAmount();
 		String str_amount = amount.toString();
-		ResultSet r = plugin.getNewDonors();
+		ResultSet r = event.getResultSet();
 
 		// Detect Duplicate Donations
 		if (plugin.getDupes(user, plugin.parseAmount(amount).replace("$", "")) >= 2) {
@@ -40,25 +40,23 @@ public class DonateEventListener implements Listener {
 		if (plugin.getConfig().getBoolean("settings.enablesignwall")) plugin.updateSignWall(user, amount);
 
 		try {
-			while (r.next()) {
-				for (String pack : plugin.getConfig().getConfigurationSection("packages").getKeys(false)) {
-					String price = plugin.getConfig().getString("packages." + pack + ".price");
-					List<String> commands = plugin.getConfig().getStringList("packages." + pack + ".commands");
-					if (!plugin.getConfig().getBoolean("settings.cumulativepackages")) {
-						if (str_amount.equals(price) || (str_amount + "0").equals(price)) {
-							r.updateString("expires", plugin.getExpiresDate(pack));
-							for (String cmnd : commands) {
-								plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmnd.replace("%player", user).replace("%amount", plugin.parseAmount(amount)));
-							}
+			for (String pack : plugin.getConfig().getConfigurationSection("packages").getKeys(false)) {
+				String price = plugin.getConfig().getString("packages." + pack + ".price");
+				List<String> commands = plugin.getConfig().getStringList("packages." + pack + ".commands");
+				if (!plugin.getConfig().getBoolean("settings.cumulativepackages")) {
+					if (str_amount.equals(price) || (str_amount + "0").equals(price)) {
+						r.updateString("expires", plugin.getExpiresDate(pack));
+						for (String cmnd : commands) {
+							plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmnd.replace("%player", user).replace("%amount", plugin.parseAmount(amount)));
 						}
-					} else {
-						Double total = plugin.getTotalDonated(r.getString("username")) + amount;
-						String str_total = total.toString();
-						if (str_total.equals(price) || (str_total + "0").equals(price)) {
-							r.updateString("expires", plugin.getExpiresDate(pack));
-							for (String cmnd : commands) {
-								plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmnd.replace("%player", user).replace("%amount", plugin.parseAmount(amount)));
-							}
+					}
+				} else {
+					Double total = plugin.getTotalDonated(r.getString("username")) + amount;
+					String str_total = total.toString();
+					if (str_total.equals(price) || (str_total + "0").equals(price)) {
+						r.updateString("expires", plugin.getExpiresDate(pack));
+						for (String cmnd : commands) {
+							plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmnd.replace("%player", user).replace("%amount", plugin.parseAmount(amount)));
 						}
 					}
 				}
