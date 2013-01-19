@@ -2,6 +2,7 @@ package me.chaseoes.donator;
 
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import java.sql.ResultSet;
 
 public class DonateEvent extends Event {
 	private static final HandlerList handlers = new HandlerList();
@@ -12,8 +13,10 @@ public class DonateEvent extends Event {
 	private String l;
 	private String e;
 	private String ex;
+	private ResultSet r;
 
-	public DonateEvent(String username, Double amount, String date, String first, String last, String email, String expiresdate) {
+	public DonateEvent(ResultSet result, String username, Double amount, String date, String first, String last, String email, String expiresdate) {
+		r = result;
 		u = username;
 		a = amount; 
 		d = date;
@@ -21,6 +24,10 @@ public class DonateEvent extends Event {
 		l = last; 
 		e = email; 
 		ex = expiresdate;
+	}
+	
+	public ResultSet getResultSet() {
+		return r;
 	}
 
 	public String getUsername() {
