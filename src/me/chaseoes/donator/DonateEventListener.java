@@ -21,15 +21,16 @@ public class DonateEventListener implements Listener {
 		// Event Variables
 		String user = event.getUsername();
 		Double amount = event.getAmount();
+		String str_amount = amount.toString();
 		ResultSet r = plugin.getNewDonors();
 
 		// Detect Duplicate Donations
 		if (plugin.getDupes(user, plugin.parseAmount(amount).replace("$", "")) >= 2) {
 			for (Player p : plugin.getServer().getOnlinePlayers()) {
 				if (p.hasPermission("donator.alert")) {
-					p.sendMessage("§8-------------- §6Donator §8- §4Dupe Alert §8--------------");
-					p.sendMessage("§cWarning! §7The player " + user + " has donated §a" + plugin.parseAmount(amount) + " §c(" + plugin.getDupes(user, plugin.parseAmount(amount).replace("$", "")) + ") times!");
-					p.sendMessage("§7Please verify that the " + plugin.getDupes(user, plugin.parseAmount(amount).replace("$", "")) + " donations were intentional and refund the extra ones if needed.");
+					p.sendMessage("ï¿½8-------------- ï¿½6Donator ï¿½8- ï¿½4Dupe Alert ï¿½8--------------");
+					p.sendMessage("ï¿½cWarning! ï¿½7The player " + user + " has donated ï¿½a" + plugin.parseAmount(amount) + " ï¿½c(" + plugin.getDupes(user, plugin.parseAmount(amount).replace("$", "")) + ") times!");
+					p.sendMessage("ï¿½7Please verify that the " + plugin.getDupes(user, plugin.parseAmount(amount).replace("$", "")) + " donations were intentional and refund the extra ones if needed.");
 				}
 			}
 		}
@@ -44,7 +45,7 @@ public class DonateEventListener implements Listener {
 					String price = plugin.getConfig().getString("packages." + pack + ".price");
 					List<String> commands = plugin.getConfig().getStringList("packages." + pack + ".commands");
 					if (!plugin.getConfig().getBoolean("settings.cumulativepackages")) {
-						if (amount.equals(price) || (amount + "0").equals(price)) {
+						if (str_amount.equals(price) || (str_amount + "0").equals(price)) {
 							r.updateString("expires", plugin.getExpiresDate(pack));
 							for (String cmnd : commands) {
 								plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmnd.replace("%player", user).replace("%amount", plugin.parseAmount(amount)));
@@ -52,7 +53,8 @@ public class DonateEventListener implements Listener {
 						}
 					} else {
 						Double total = plugin.getTotalDonated(r.getString("username")) + amount;
-						if (total.equals(price) || (total + "0").equals(price)) {
+						String str_total = total.toString();
+						if (str_total.equals(price) || (str_total + "0").equals(price)) {
 							r.updateString("expires", plugin.getExpiresDate(pack));
 							for (String cmnd : commands) {
 								plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmnd.replace("%player", user).replace("%amount", plugin.parseAmount(amount)));
