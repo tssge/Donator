@@ -115,7 +115,7 @@ public class Donator extends JavaPlugin {
 				while (r.next()) {
 					String user = r.getString("username");
 					Double amount = r.getDouble("amount");
-					DonateEvent event = new DonateEvent(r.getString("username"), r.getDouble("amount"), r.getString("date"), r.getString("first_name"), r.getString("last_name"), r.getString("payer_email"), r.getString("expires"));
+					DonateEvent event = new DonateEvent(r, r.getString("username"), r.getDouble("amount"), r.getString("date"), r.getString("first_name"), r.getString("last_name"), r.getString("payer_email"), r.getString("expires"));
 					getServer().getPluginManager().callEvent(event);
 					r.updateString("processed", "true");
 					r.updateRow();
@@ -132,18 +132,20 @@ public class Donator extends JavaPlugin {
 					if (rx.getString("expires") != null && rx.getString("expires").equalsIgnoreCase(getCurrentDate())) {
 						String user = rx.getString("username");
 						Double amount = rx.getDouble("amount");
+						String str_amount = amount.toString();
 						for (String pack : getConfig().getConfigurationSection("packages").getKeys(false)) {
 							String price = getConfig().getString("packages." + pack + ".price");
 							List<String> commands = getConfig().getStringList("packages." + pack + ".expires-commands");
 							if (!getConfig().getBoolean("settings.cumulativepackages")) {
-								if (amount.equals(price) || (amount + "0").equals(price)) {
+								if (str_amount.equals(price) || (str_amount + "0").equals(price)) {
 									for (String cmnd : commands) {
 										getServer().dispatchCommand(getServer().getConsoleSender(), cmnd.replace("%player", user).replace("%amount", amount + ""));
 									}
 								}
 							} else {
 								Double total = getTotalDonated(user);
-								if (total.equals(price) || (total + "0").equals(price)) {
+								String str_total = total.toString();
+								if (str_total.equals(price) || (str_total + "0").equals(price)) {
 									for (String cmnd : commands) {
 										getServer().dispatchCommand(getServer().getConsoleSender(), cmnd.replace("%player", user).replace("%amount", amount + ""));
 									}
@@ -324,30 +326,30 @@ public class Donator extends JavaPlugin {
 	}
 
 	public void formatRecentQuick(Player player, String id, String date, String username, String amount, String totalamount) {
-		player.sendMessage("§8(#" + id + ") §6" + date.substring(9, date.length()).substring(0, 12) + " §a" + username + " §6for §a$" + amount + " §c(" + parseAmount(totalamount) + " Total)");
+		player.sendMessage("ï¿½8(#" + id + ") ï¿½6" + date.substring(9, date.length()).substring(0, 12) + " ï¿½a" + username + " ï¿½6for ï¿½a$" + amount + " ï¿½c(" + parseAmount(totalamount) + " Total)");
 	}
 
 	public void formatRecentByPlayer(Player player, String id, String date, String amount) {
-		player.sendMessage("§8(#" + id + ") §6" + date.substring(9, date.length()).substring(0, 12) + " §6for §a$" + amount + "§6.");
+		player.sendMessage("ï¿½8(#" + id + ") ï¿½6" + date.substring(9, date.length()).substring(0, 12) + " ï¿½6for ï¿½a$" + amount + "ï¿½6.");
 	}
 
 	public void noPermission(CommandSender cs) {
-		cs.sendMessage("§8[Donator] §cYou do not have permission to do that.");
+		cs.sendMessage("ï¿½8[Donator] ï¿½cYou do not have permission to do that.");
 	}
 
 	@Override
 	public boolean onCommand(CommandSender cs, Command cmnd, String string, String[] strings) {
 		if (cmnd.getName().equalsIgnoreCase("donator")) {
 			if (strings.length == 0) {
-				cs.sendMessage("§8-------------- §6Donator §8- §aGeneral Info. §8--------------");
-				cs.sendMessage("§7Accept donations and automatically give ingame perks!");
-				cs.sendMessage("§7Plugin developed by §9chaseoes§7.");
-				cs.sendMessage("§6http://dev.bukkit.org/server-mods/donator/");
+				cs.sendMessage("ï¿½8-------------- ï¿½6Donator ï¿½8- ï¿½aGeneral Info. ï¿½8--------------");
+				cs.sendMessage("ï¿½7Accept donations and automatically give ingame perks!");
+				cs.sendMessage("ï¿½7Plugin developed by ï¿½9chaseoesï¿½7.");
+				cs.sendMessage("ï¿½6http://dev.bukkit.org/server-mods/donator/");
 			}
 			if (strings.length == 1) {
 				if (strings[0].equalsIgnoreCase("recent")) {
 					if (cs.hasPermission("donator.recent")) {
-						cs.sendMessage("§8-------------- §6Donator §8- §aRecent Donations §8--------------");
+						cs.sendMessage("ï¿½8-------------- ï¿½6Donator ï¿½8- ï¿½aRecent Donations ï¿½8--------------");
 						ResultSet r = getRecentDonors();
 						try {
 							while (r.next()) {
@@ -365,12 +367,12 @@ public class Donator extends JavaPlugin {
 						if (cs.hasPermission("donator.setwall")) {
 							if (!settingwall.contains(cs.getName())) {
 								settingwall.add(cs.getName());
-								cs.sendMessage("§8-------------- §6Donator §8- §aSign Wall §8--------------");
-								cs.sendMessage("§8Wand enabled, please use a golden axe to set the sign wall.");
+								cs.sendMessage("ï¿½8-------------- ï¿½6Donator ï¿½8- ï¿½aSign Wall ï¿½8--------------");
+								cs.sendMessage("ï¿½8Wand enabled, please use a golden axe to set the sign wall.");
 							} else {
 								settingwall.remove(cs.getName());
-								cs.sendMessage("§8-------------- §6Donator §8- §aSign Wall §8--------------");
-								cs.sendMessage("§8Wand disabled.");
+								cs.sendMessage("ï¿½8-------------- ï¿½6Donator ï¿½8- ï¿½aSign Wall ï¿½8--------------");
+								cs.sendMessage("ï¿½8Wand disabled.");
 							}
 						} else {
 							noPermission(cs);
@@ -383,8 +385,8 @@ public class Donator extends JavaPlugin {
 					if (cs.hasPermission("donator.reload")) {
 						reloadConfig();
 						saveConfig();
-						cs.sendMessage("§8-------------- §6Donator §8- §aConfiguration §8--------------");
-						cs.sendMessage("§8Successfully reloaded the configuration.");
+						cs.sendMessage("ï¿½8-------------- ï¿½6Donator ï¿½8- ï¿½aConfiguration ï¿½8--------------");
+						cs.sendMessage("ï¿½8Successfully reloaded the configuration.");
 					} else {
 						noPermission(cs);
 					}
@@ -394,16 +396,16 @@ public class Donator extends JavaPlugin {
 				if (strings[0].equalsIgnoreCase("check")) {
 					if (cs.hasPermission("donator.check")) {
 						ResultSet r = getDonationResult(strings[1]);
-						cs.sendMessage("§8-------------- §6Donator §8- §aDonation # " + strings[1] + " §8--------------");
+						cs.sendMessage("ï¿½8-------------- ï¿½6Donator ï¿½8- ï¿½aDonation # " + strings[1] + " ï¿½8--------------");
 						try {
 							while (r.next()) {
-								cs.sendMessage("§6Player Name: §c" + r.getString("username"));
-								cs.sendMessage("§6Amount Donated: §a$" + r.getString("amount"));
-								cs.sendMessage("§6Date Donated: §7" + r.getString("date").substring(9, r.getString("date").length()).substring(0, 12));
-								cs.sendMessage("§6Full Name: §7" + r.getString("first_name") + " " + r.getString("last_name"));
-								cs.sendMessage("§6Email: §7" + r.getString("payer_email"));
-								cs.sendMessage("§6Has Expired: §7" + r.getString("expired").replace("false", "No").replace("true", "Yes"));
-								cs.sendMessage("§6Expires On: §7" + r.getString("expires").replace("null", "Never"));
+								cs.sendMessage("ï¿½6Player Name: ï¿½c" + r.getString("username"));
+								cs.sendMessage("ï¿½6Amount Donated: ï¿½a$" + r.getString("amount"));
+								cs.sendMessage("ï¿½6Date Donated: ï¿½7" + r.getString("date").substring(9, r.getString("date").length()).substring(0, 12));
+								cs.sendMessage("ï¿½6Full Name: ï¿½7" + r.getString("first_name") + " " + r.getString("last_name"));
+								cs.sendMessage("ï¿½6Email: ï¿½7" + r.getString("payer_email"));
+								cs.sendMessage("ï¿½6Has Expired: ï¿½7" + r.getString("expired").replace("false", "No").replace("true", "Yes"));
+								cs.sendMessage("ï¿½6Expires On: ï¿½7" + r.getString("expires").replace("null", "Never"));
 							}
 						} catch (SQLException e) {
 							if (debuggling) e.printStackTrace();
@@ -414,9 +416,9 @@ public class Donator extends JavaPlugin {
 				}
 				if (strings[0].equalsIgnoreCase("checkplayer")) {
 					if (cs.hasPermission("donator.check")) {
-						cs.sendMessage("§8-------------- §6Donator §8- §aPlayer " + strings[1] + " §8--------------");
-						cs.sendMessage("§6Player: §c" + strings[1]);
-						cs.sendMessage("§6Total Donated: §a$" + getTotalDonated(strings[1]));
+						cs.sendMessage("ï¿½8-------------- ï¿½6Donator ï¿½8- ï¿½aPlayer " + strings[1] + " ï¿½8--------------");
+						cs.sendMessage("ï¿½6Player: ï¿½c" + strings[1]);
+						cs.sendMessage("ï¿½6Total Donated: ï¿½a$" + getTotalDonated(strings[1]));
 						ResultSet r = getResultSet("SELECT * FROM donations WHERE username='" + strings[1] + "' ORDER BY id DESC LIMIT 5");
 						try {
 							while (r.next()) {
