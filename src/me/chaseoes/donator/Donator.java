@@ -86,7 +86,7 @@ public class Donator extends JavaPlugin {
 			getServer().getPluginManager().registerEvents(new DonateEventListener(this), this);
 
 			// Start a task to check for new donations.
-			getServer().getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+			getServer().getScheduler().runTaskTimerAsynchronously(this, new Runnable() {
 				public void run() {
 					checkForDonations();
 				}
